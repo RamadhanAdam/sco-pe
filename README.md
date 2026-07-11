@@ -8,9 +8,8 @@ Run `make` to compile everything. The final binary shows up at `bin/scope`.
 
 ## Running the tests
 
-Run `make test` to compile and run the test suite. Right now that covers `file.c` — opening a real PE file and confirming it reads the correct number of bytes.
+Run `make test` to compile and run the test suite. Currently covers `file.c` and `dos.c` — opening a real PE file, confirming it reads the correct number of bytes, and confirming the DOS header parses correctly.
 
 ## Currently
 
-File I/O is working.
-Opening a PE file, reading it into memory, and freeing it afterward. DOS header, NT headers, sections, imports, and exports are still being built out.
+File I/O and DOS header parsing are working. NT headers, sections, imports, and exports are still being built out.
