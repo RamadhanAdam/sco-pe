@@ -11,4 +11,4 @@ build/
 .idea/
 *.swp
 docs/BUILD_GUIDE.rst
-*.html
+*.htmlbin/
