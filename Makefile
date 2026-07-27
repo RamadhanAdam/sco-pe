@@ -8,6 +8,9 @@ SRC := $(wildcard src/*.c)
 # Convert the list of .c files into matching .o paths inside build/
 OBJ := $(patsubst src/%.c, build/%.o, $(SRC))
 
+# Automatically find every test file in tests/
+TEST_SRCS := $(wildcard tests/*_test.c)
+
 # Final executable target
 # Linking all the .o files (in OBJ) into one binary at bin/scope
 bin/scope: $(OBJ)
@@ -20,16 +23,16 @@ build/%.o: src/%.c
 # Removing everything Make has built, so we can rebuild from scratch
 .PHONY: clean
 clean:
-	rm -rf build/*.o bin/scope
+	rm -rf build/*.o bin/*
 
-# Compiles and runs the test suite 
+# Automatically builds and executes all test targets in the tests directory
 .PHONY: test
 test:
-	$(CC) $(CFLAGS) tests/file_test.c src/file.c -o bin/file_test
-	./bin/file_test
-	$(CC) $(CFLAGS) tests/dos_test.c src/file.c src/dos.c -o bin/dos_test
-	./bin/dos_test
-	$(CC) $(CFLAGS) tests/nt_test.c src/file.c src/dos.c src/nt.c -o bin/nt_test
-	./bin/nt_test
-	$(CC) $(CFLAGS) tests/sections_test.c src/file.c src/dos.c src/nt.c src/sections.c -o bin/sections_test
-	./bin/sections_test
+	@mkdir -p bin
+	@for test_file in $(TEST_SRCS); do \
+		echo "Building and running $$test_file..."; \
+		bin_name=bin/$$(basename $$test_file .c); \
+		$(CC) $(CFLAGS) $$test_file $(SRC) -o $$bin_name || exit 1; \
+		./$$bin_name || exit 1; \
+		echo "----------------------------------------"; \
+	done
