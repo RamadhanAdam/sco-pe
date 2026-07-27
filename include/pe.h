@@ -3,47 +3,57 @@
 #ifndef PE_H
 #define PE_H
 
-// Minimal DOS header - only the two fields we actually use
+// DOS header - only fields we use, rest is padding
 typedef struct {
-    unsigned short e_magic;      // 2 bytes, offset 0x00 - should be "MZ" (0x5A4D)
-    unsigned char  reserved[58]; // padding, offset 0x02 to 0x3B, unused
-    unsigned int   e_lfanew;     // 4 bytes, offset 0x3C - offset to NT headers
+    unsigned short e_magic;      // "MZ" (0x5A4D)
+    unsigned char  reserved[58];
+    unsigned int   e_lfanew;     // offset to NT headers
 } DOS_HEADER;
 
-// Minimal File Header - every field is present since they're all small
-// and cheap to keep for context, even ones we don't use yet
+// COFF file header
 typedef struct {
-    unsigned short machine;                 // target CPU type
-    unsigned short number_of_sections;      // how many section table entries follow
-    unsigned int   time_date_stamp;         // build timestamp, unused for now
-    unsigned int   pointer_to_symbol_table; // deprecated, unused
-    unsigned int   number_of_symbols;       // deprecated, unused
-    unsigned short size_of_optional_header; // size of the optional header that follows
-    unsigned short characteristics;         // flags (executable, DLL, etc.)
+    unsigned short machine;
+    unsigned short number_of_sections;
+    unsigned int   time_date_stamp;
+    unsigned int   pointer_to_symbol_table; // deprecated
+    unsigned int   number_of_symbols;       // deprecated
+    unsigned short size_of_optional_header;
+    unsigned short characteristics;
 } FILE_HEADER;
 
-// Minimal Optional Header - only magic and size_of_headers matter right now.
-// reserved[58] skips everything between them so size_of_headers lands
-// at the correct real offset (0x3C) when we cast raw bytes onto this struct
+// RVA/size pair
 typedef struct {
-    unsigned short magic;           // 0x10b = PE32, 0x20b = PE32+
-    unsigned char  reserved[58];    // padding, unused fields between magic and size_of_headers
-    unsigned int   size_of_headers; // combined size of all headers
+    unsigned int virtual_address;
+    unsigned int size;
+} DATA_DIRECTORY;
+
+// Indices into optional_header.data_directory[]
+#define DIR_EXPORT   0
+#define DIR_IMPORT   1
+#define DIR_SECURITY 4
+
+// Optional header (PE32+). reserved/reserved2 preserve real byte offsets.
+typedef struct {
+    unsigned short magic;              // 0x20b = PE32+
+    unsigned char  reserved[58];
+    unsigned int   size_of_headers;
+    unsigned char  reserved2[48];
+    DATA_DIRECTORY data_directory[16]; // export, import, resource, security, etc.
 } OPTIONAL_HEADER;
 
 // PE signature + File Header + Optional Header
 typedef struct {
-    unsigned int    signature;      // should be "PE\0\0" (0x00004550)
+    unsigned int    signature;  // "PE\0\0" (0x00004550)
     FILE_HEADER     file_header;
     OPTIONAL_HEADER optional_header;
 } NT_HEADERS;
 
-// Holds everything discovered about a PE file as parsing proceeds
+// Everything discovered about a PE file as parsing proceeds
 typedef struct {
-    unsigned char *buffer;        // raw file bytes
-    long size;                    // number of bytes in buffer
-    DOS_HEADER *dos_header;       // points into buffer, filled in by dos.c
-    NT_HEADERS *nt_headers;       // points into buffer, filled in by nt.c
+    unsigned char *buffer;
+    long size;
+    DOS_HEADER *dos_header;
+    NT_HEADERS *nt_headers;
 } PEFile;
 
 #endif // PE_H
