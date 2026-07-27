@@ -1,79 +1,131 @@
-```markdown
 # sco-pe
 
-PE (Portable Executable) file parser in C. Lightweight, no external dependencies, built for static analysis.
+A lightweight C library and command-line tool for parsing and analysing Windows Portable Executable (PE) files. The project manually parses PE structures without relying on external PE parsing libraries, making it suitable for learning the PE format, malware analysis, reverse engineering, and digital forensics.
 
-## Build
+## Features
+
+* Parse DOS Header
+* Parse NT Headers
+* Parse File and Optional Headers
+* Parse Section Table
+* Display section permissions (Read, Write, Execute)
+* Parse Import Directory
+* Display imported DLLs and function names
+* Parse Export Directory
+* Display exported function names
+* Detect PE overlay data
+* Perform defensive bounds checking to safely handle malformed PE files
+
+## Repository Structure
+
+```text
+.
+├── include/    Header files
+├── src/        Source code
+├── tests/      Unit tests
+├── samples/    Sample PE files
+├── tools/      Standalone utilities
+├── docs/       Build documentation
+├── build/      Generated object files
+├── bin/        Generated executables
+├── Makefile
+├── README.md
+└── LICENSE
+```
+
+## Requirements
+
+* GCC
+* GNU Make
+* A Unix-like environment (Linux or macOS)
+
+## Building
+
+Compile the project:
 
 ```bash
 make
 ```
 
-Binary is `bin/scope`.
-
-## Run
-
-```bash
-./bin/scope <file>
-```
-
-Output includes:
-
-- file size, architecture (x86/x64/ARM)
-- DOS header (`e_lfanew`)
-- NT headers (magic, section count)
-- section table: virtual address, virtual size, raw size, R/W/X permissions
-- imports: DLL names + all imported functions (named imports only)
-- exports: function names, DLL name if present
-- overlay detection: shows if extra data exists past the last section or authenticode signature
-
-Example:
+The executable will be generated at:
 
 ```text
-[Imports] (8 DLLs)
-  KERNEL32.dll (12 functions)
-    └── CreateFileA
-    └── WriteFile
-    └── ...
+bin/scope
 ```
 
-## Test
+Remove generated files:
+
+```bash
+make clean
+```
+
+## Usage
+
+Analyse a PE file by providing its path as the first argument.
+
+```bash
+./bin/scope <pe_file>
+```
+
+The parser reports:
+
+* File information
+* DOS Header
+* NT Headers
+* Section Table
+* Import Directory
+* Export Directory
+* Overlay information
+
+## Testing
+
+Run the complete test suite:
 
 ```bash
 make test
 ```
 
-Runs the unit test suite covering all parsers: file, DOS, NT, sections, utils (RVA to offset), imports, exports, and the security/bounds module.
+The test suite validates:
 
-## Security / bounds checking
+* File loading
+* DOS Header parsing
+* NT Header parsing
+* Section table parsing
+* RVA-to-file offset conversion
+* Import parsing
+* Export parsing
+* Shared security and bounds-checking routines
 
-All parsers share `security.c`:
+## Tools
 
-- `pe_bounds_ok()` – validate that a read range fits in the file
-- `pe_count_plausible()` – reject insane table counts
-- `pe_safe_strcpy()` – copy a string from the PE buffer without reading past EOF, even if no null terminator exists
+The repository includes standalone utilities built using the same PE parsing concepts.
 
-This makes the tool safe for untrusted input.
+### C
 
-## Extras
+`tools/c/overlay_extract.c`
 
-`tools/c/overlay_extract.c` and `tools/py/overlay_extract.py` extract appended overlay data (ignores authenticode signature). Useful for finding hidden payloads.
+Extracts overlay data appended after the PE image while accounting for the Authenticode Certificate Table.
 
-Build the C version:
+Build:
 
 ```bash
-gcc tools/c/overlay_extract.c -o overlay
+gcc tools/c/overlay_extract.c -o overlay_extract
 ```
 
-Run:
+### Python
 
-```bash
-overlay_extract input.exe output.bin
-```
+`tools/py/overlay_extract.py`
 
-Python version requires `pefile`.
+Python implementation of the same overlay extraction logic for scripting and rapid analysis.
 
----
+## Documentation
 
-Parsing pipeline is complete and production-ready.
-```
+Additional build documentation is available in the `docs/` directory.
+
+## Contributing
+
+Contributions are welcome. Bug reports, feature requests, and pull requests are appreciated.
+
+## License
+
+This project is licensed under the MIT License. See the `LICENSE` file for details.
