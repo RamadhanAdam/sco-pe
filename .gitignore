@@ -1,6 +1,7 @@
 *.o
 *.obj
 *.exe
+!samples/*.exe
 *.out
 *.dylib
 *.so
