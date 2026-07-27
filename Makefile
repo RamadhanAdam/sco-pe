@@ -31,3 +31,5 @@ test:
 	./bin/dos_test
 	$(CC) $(CFLAGS) tests/nt_test.c src/file.c src/dos.c src/nt.c -o bin/nt_test
 	./bin/nt_test
+	$(CC) $(CFLAGS) tests/sections_test.c src/file.c src/dos.c src/nt.c src/sections.c -o bin/sections_test
+	./bin/sections_test
