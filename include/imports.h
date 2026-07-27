@@ -1,23 +1,22 @@
-// Declares the import table parsing function
-
 #ifndef IMPORTS_H
 #define IMPORTS_H
+
 #include "pe.h"
 
-// Preventing buffer allocation overflows by imposing a safe hard boundary
-#define MAX_IMPORTED_DLLS 64
+#define MAX_IMPORTED_DLLS   64
+#define MAX_IMPORTED_FUNCS  256   // max functions per DLL
 
 typedef struct {
-    char name[256]; // Maximum filename length storoage (matches Windows API specs)
-
+    char name[256];                      // DLL name
+    char funcs[MAX_IMPORTED_FUNCS][256]; // imported function names
+    int  func_count;                     // how many functions from this DLL
 } ImportedDLL;
 
 typedef struct {
     ImportedDLL dlls[MAX_IMPORTED_DLLS];
-    int count; // Total number of valid dynamic libraries extracted
+    int count;
 } ImportTable;
 
-// Entrypoint wrapper to extract dependency listings out of parsed PE image context
 int parse_imports(PEFile *pe, ImportTable *out);
 
-#endif // IMPORTS_H
+#endif
