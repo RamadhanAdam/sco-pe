@@ -1,4 +1,4 @@
-x// Tests for parse_nt_headers: valid PE32+, bad signature, bad magic, truncated buffer
+// Tests for parse_nt_headers: valid PE32+, bad signature, bad magic, truncated buffer
 #include "pe.h"
 #include "dos.h"
 #include "nt.h"
