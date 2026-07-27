@@ -19,8 +19,9 @@ TEST_SRCS := $(wildcard tests/*_test.c)
 bin/scope: $(OBJ)
 	$(CC) $^ -o $@
 
-# Pattern rule: compile any src/X.c into build/X.o
+# Pattern rule: compile any src/X.c into build/X.o, creating output directories if needed
 build/%.o: src/%.c
+	@mkdir -p build bin
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Removing everything Make has built, so we can rebuild from scratch
