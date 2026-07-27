@@ -1,6 +1,6 @@
 # sco-pe
 
-A lightweight C library and command-line tool for parsing and analysing Windows Portable Executable (PE) files. The project manually parses PE structures without relying on external PE parsing libraries, making it suitable for learning the PE format, malware analysis, reverse engineering, and digital forensics.
+A lightweight command-line tool written in C for parsing and analysing Windows Portable Executable (PE) files. The project manually parses PE structures without relying on external PE parsing libraries, making it suitable for learning the PE format, malware analysis, reverse engineering, and digital forensics.
 
 ## Features
 
