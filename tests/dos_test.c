@@ -13,13 +13,19 @@ int main(void) {
         return 1;
     }
 
-if (pe.dos_header->e_lfanew != 0x78) {
-    printf("FAIL: expected e_lfanew 0x78, got 0x%X\n", pe.dos_header->e_lfanew);
-    pe_close(&pe);
-    return 1;
-}
+    if (parse_dos_header(&pe) != 0) {
+        printf("FAIL: parse_dos_header returned failure\n");
+        pe_close(&pe);
+        return 1;
+    }
 
-printf("PASS: DOS header parsed. e_lfanew = 0x%X\n", pe.dos_header->e_lfanew);
+    if (pe.dos_header->e_lfanew != 0x78) {
+        printf("FAIL: expected e_lfanew 0x78, got 0x%X\n", pe.dos_header->e_lfanew);
+        pe_close(&pe);
+        return 1;
+    }
+
+    printf("PASS: DOS header parsed. e_lfanew = 0x%X\n", pe.dos_header->e_lfanew);
 
     pe_close(&pe);
     return 0;
