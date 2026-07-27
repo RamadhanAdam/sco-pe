@@ -5,6 +5,9 @@ CFLAGS := -Wall -Wextra -Iinclude
 # Automatically find every .c file in src/
 SRC := $(wildcard src/*.c)
 
+# Exclude src/main.c from core source objects used in tests
+SRC_NO_MAIN := $(filter-out src/main.c, $(SRC))
+
 # Convert the list of .c files into matching .o paths inside build/
 OBJ := $(patsubst src/%.c, build/%.o, $(SRC))
 
@@ -32,7 +35,7 @@ test:
 	@for test_file in $(TEST_SRCS); do \
 		echo "Building and running $$test_file..."; \
 		bin_name=bin/$$(basename $$test_file .c); \
-		$(CC) $(CFLAGS) $$test_file $(SRC) -o $$bin_name || exit 1; \
+		$(CC) $(CFLAGS) $$test_file $(SRC_NO_MAIN) -o $$bin_name || exit 1; \
 		./$$bin_name || exit 1; \
 		echo "----------------------------------------"; \
 	done
