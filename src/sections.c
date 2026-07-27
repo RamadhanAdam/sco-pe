@@ -1,10 +1,16 @@
 // Parses the section table: name, virtual address, size, characteristics
 #include "sections.h"
 #include "pe.h"
+#include "security.h"
 #include <stdio.h>
 
 int parse_sections(PEFile *pe) {
     unsigned short count = pe->nt_headers->file_header.number_of_sections;
+
+    if (!pe_count_plausible(count, 96)) {
+        printf("Error: implausible section count (%u)\n", count);
+        return 1;
+    }
 
     // Skip PE Signature (4 bytes), File Header, and Optional Header to reach Section Table
     unsigned char *table = (unsigned char *)pe->nt_headers

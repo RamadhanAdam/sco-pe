@@ -1,8 +1,10 @@
 // Walks the import table: lists DLLs the file imports
 #include "imports.h"
 #include "utils.h"
+#include "security.h"
 #include <stdio.h>
 #include <string.h>
+#include "security.h"
 
 int parse_imports(PEFile *pe, ImportTable *out) {
     out->count = 0;
@@ -31,15 +33,14 @@ int parse_imports(PEFile *pe, ImportTable *out) {
 
         // Tracking down the raw file location of the actual ASCII character string for the DLL name
         long name_offset = rva_to_offset(pe, desc->name);
-        if (name_offset < 0 || name_offset >= pe->size) {
+        if (!pe_bounds_ok(pe, name_offset, 1)) {
             printf("Error: import DLL name RVA out of bounds\n");
             return 1;
         }
 
         // Securely copying the string data if space remains in the output container
         if (out->count < MAX_IMPORTED_DLLS) {
-            strncpy(out->dlls[out->count].name, (char *)(pe->buffer + name_offset), 255);
-            out->dlls[out->count].name[255] = '\0'; // Guarantee zero-termination against dirty payloads
+            pe_safe_strcpy(pe, name_offset, out->dlls[out->count].name, sizeof(out->dlls[out->count].name));
             out->count++;
         }
 
