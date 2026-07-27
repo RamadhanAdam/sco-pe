@@ -48,12 +48,51 @@ typedef struct {
     OPTIONAL_HEADER optional_header;
 } NT_HEADERS;
 
+// Section header (IMAGE_SECTION_HEADER)
+typedef struct {
+    char           name[8];
+    unsigned int   virtual_size;
+    unsigned int   virtual_address;
+    unsigned int   size_of_raw_data;
+    unsigned int   pointer_to_raw_data;
+    unsigned int   pointer_to_relocations;
+    unsigned int   pointer_to_linenumbers;
+    unsigned short number_of_relocations;
+    unsigned short number_of_linenumbers;
+    unsigned int   characteristics;
+} SECTION_HEADER;
+
+// Import descriptor (IMAGE_IMPORT_DESCRIPTOR)
+typedef struct {
+    unsigned int original_first_thunk;
+    unsigned int time_date_stamp;
+    unsigned int forwarder_chain;
+    unsigned int name;          // RVA to DLL name string
+    unsigned int first_thunk;
+} IMPORT_DESCRIPTOR;
+
+// Export directory (IMAGE_EXPORT_DIRECTORY)
+typedef struct {
+    unsigned int   characteristics;
+    unsigned int   time_date_stamp;
+    unsigned short major_version;
+    unsigned short minor_version;
+    unsigned int   name;
+    unsigned int   base;
+    unsigned int   number_of_functions;
+    unsigned int   number_of_names;
+    unsigned int   address_of_functions;
+    unsigned int   address_of_names;
+    unsigned int   address_of_name_ordinals;
+} EXPORT_DIRECTORY;
+
 // Everything discovered about a PE file as parsing proceeds
 typedef struct {
     unsigned char *buffer;
     long size;
     DOS_HEADER *dos_header;
     NT_HEADERS *nt_headers;
+    SECTION_HEADER *sections;
 } PEFile;
 
 #endif // PE_H
